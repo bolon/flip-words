@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.nnd.myapplication", appContext.getPackageName());
+        assertEquals("com.nnd.flipwords", appContext.getPackageName());
     }
 }
