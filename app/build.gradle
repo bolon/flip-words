@@ -5,7 +5,7 @@ android {
     compileSdkVersion 26
     buildToolsVersion "25.0.3"
     defaultConfig {
-        applicationId "com.nnd.myapplication"
+        applicationId "com.nnd.flipwords"
         minSdkVersion 21
         targetSdkVersion 26
         versionCode 1
