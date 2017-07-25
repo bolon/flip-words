@@ -1,0 +1,31 @@
+*.iml
+.gradle
+
+#local setup (sdk path, etc)
+/local.properties
+key.properties
+
+#intellij
+/.idea/workspace.xml
+/.idea/libraries
+/.idea/gradle.xml
+/.idea/tasks.xml
+/.idea/gradle.xlm
+/.idea/inspectionProfiles/Project_Default.xml
+/.idea/misc.xml
+/.idea/inspectionProfiles/profiles_settings.xml
+/.idea/codeStyleSettings.xml
+/.idea/markdown-navigator
+
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+build/
+.idea/vcs.xml
+
+#Generated files
+bin/
+gen/
+out/
+*.apk

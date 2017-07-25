@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">FlipWords</string>
+
+    <string name="menu_search">Search</string>
+    <string name="menu_settings">Settings</string>
+    <string name="menu_navigation">Navigation</string>
+    <string name="btn_see_meaning_front">Tap to see the meaning!</string>
+    <string name="btn_negative_card_back">I Don\'t Know!</string>
+    <string name="btn_positive_card_back">I Knew this Word!</string>
+</resources>
