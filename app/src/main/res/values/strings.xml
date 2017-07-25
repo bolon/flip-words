@@ -7,4 +7,6 @@
     <string name="btn_see_meaning_front">Tap to see the meaning!</string>
     <string name="btn_negative_card_back">I Don\'t Know!</string>
     <string name="btn_positive_card_back">I Knew this Word!</string>
+    <string name="text_back_meaning">meaning</string>
+    <string name="txt_sample_back">example</string>
 </resources>

@@ -55,7 +55,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/txtWord_cardback"
                     android:layout_marginTop="2dp"
-                    android:text="reproduce, duplicate"
+                    android:text="@string/text_back_meaning"
                     android:textSize="15sp"/>
 
 
@@ -75,7 +75,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/txtLabelExample_cardback"
-                    android:text="reproduce, duplicate"
+                    android:text="@string/txt_sample_back"
                     android:textColor="@color/colorGrayTextDark"
                     android:textSize="15sp"/>
 
