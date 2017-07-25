@@ -7,21 +7,16 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <View
-        android:id="@+id/mid"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="128dp"
-        />
-
     <com.wajahatkarim3.easyflipview.EasyFlipView
+        android:layout_marginTop="64dp"
         android:id="@+id/flipView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/mid"
         app:flipDuration="400">
 
-        <include android:id="@+id/layout_card_back" layout="@layout/layout_card_back"/>
+        <include
+            android:id="@+id/layout_card_back"
+            layout="@layout/layout_card_back"/>
 
         <include layout="@layout/layout_card_front"/>
 
