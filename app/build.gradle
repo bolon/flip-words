@@ -41,7 +41,7 @@ def getProperties(String property) {
     return "\"" + properties.getProperty(property) + "\""
 }
 
-def androidAppCompatVersion = '26.0.0-beta2'
+def androidAppCompatVersion = '26.0.0'
 def retrofitVersion = '2.3.0'
 def daggerVersion = '2.11'
 def butterKnifeVersion = '8.7.0'
@@ -78,7 +78,7 @@ dependencies {
 
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
 
-    compile 'com.wajahatkarim3.EasyFlipView:EasyFlipView:1.0.2'
+    compile 'com.github.bolon:EasyFlipView:1.0.3'
 
     compile 'com.jakewharton.timber:timber:4.5.1'
 

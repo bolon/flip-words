@@ -60,6 +60,10 @@ public class MainActivity extends AppCompatActivity {
         cardBackContainer.setVisibility(View.INVISIBLE);
         animationView.setVisibility(View.VISIBLE);
 
+        txtViewCardBack.setOnClickListener(view -> {
+
+        });
+
         wordsAPI.getWordOfTheDay(Utils.getRandomDate(), wordnikKey)
                 .enqueue(new Callback<ResponseWord>() {
                     @Override
