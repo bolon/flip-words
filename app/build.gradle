@@ -4,15 +4,28 @@ apply plugin: 'me.tatarka.retrolambda'
 android {
     compileSdkVersion 26
     buildToolsVersion "25.0.3"
-    defaultConfig {
-        applicationId "com.nnd.flipwords"
-        minSdkVersion 16
-        targetSdkVersion 26
-        versionCode 3
-        versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        renderscriptSupportModeEnabled true
+
+    def versionPropsFile = new File('version.properties')
+
+    if (versionPropsFile.canRead()) {
+        def vcode = getVersionCode()
+        def vname = getVersionName()
+
+        incrementVersionProp(versionPropsFile)
+
+        defaultConfig {
+            applicationId "com.nnd.flipwords"
+            minSdkVersion 16
+            targetSdkVersion 26
+            versionCode vcode
+            versionName vname
+            testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+            renderscriptSupportModeEnabled true
+        }
+    } else {
+        throw new GradleException("Could not read version.properties")
     }
+
     buildTypes.each {
         it.buildConfigField "String", "API_KEY_WORDNIK", getProperties("API_KEY_WORDNIK")
     }
@@ -27,6 +40,7 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 }
+
 /**
  * Get properties from private file
  * @param property property name
@@ -36,9 +50,49 @@ def getProperties(String property) {
     Properties properties = new Properties()
     properties.load(new FileInputStream("$rootDir/key.properties"))
 
-    System.out.println(properties.getProperty(property));
-
     return "\"" + properties.getProperty(property) + "\""
+}
+
+def getVersionCode() {
+    Properties properties = new Properties()
+    properties.load(new FileInputStream("$rootDir/version.properties"))
+
+    def major = properties['major'] as int // 1..∞
+    def minor = properties['minor'] as int // 1..99
+    def build = properties['build'] as int // 0..999
+
+    return (major * 100 + minor) * 1000 + build;
+}
+
+def getVersionName() {
+    Properties properties = new Properties()
+    properties.load(new FileInputStream("$rootDir/version.properties"))
+
+    def versionName = properties['major'] + "." + properties['minor'] + "." + properties['build']
+
+    return versionName;
+}
+
+def incrementVersionProp(File versionFile) {
+    Properties properties = new Properties()
+    properties.load(new FileInputStream("$rootDir/version.properties"))
+
+    def major = properties['major'] as int // 1..∞
+    def minor = properties['minor'] as int // 1..99
+    def build = properties['build'] as int // 0..999
+
+    if (build + 1 > 999) {
+        if (minor + 1 > 99)
+            major = major + 1;
+        else
+            minor = minor + 1;
+    } else
+        build = build + 1;
+
+    properties['build'] = build.toString()
+    properties['minor'] = minor.toString()
+    properties['major'] = major.toString()
+    properties.store(versionFile.newWriter(), null)
 }
 
 def androidAppCompatVersion = '26.0.0'
@@ -68,7 +122,7 @@ dependencies {
 
     compile "com.squareup.retrofit2:retrofit:$retrofitVersion"
     compile "com.squareup.retrofit2:converter-gson:$retrofitVersion"
-    compile ("com.squareup.retrofit2:converter-simplexml:$retrofitVersion") {
+    compile("com.squareup.retrofit2:converter-simplexml:$retrofitVersion") {
         exclude group: 'xpp3', module: 'xpp3'
         exclude group: 'stax', module: 'stax-api'
         exclude group: 'stax', module: 'stax'
