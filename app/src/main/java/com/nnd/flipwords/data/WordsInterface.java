@@ -12,5 +12,5 @@ import retrofit2.http.Query;
 
 public interface WordsInterface {
     @GET("wordOfTheDay")
-    Call<ResponseWord> getWordOfTheDay(@Query("date") String date, @Query("api_key") String apiKey);
+    Call<ResponseWord> getWordOfTheDay(@Query("date") String date);
 }

@@ -10,12 +10,12 @@ import java.util.List;
 
 @Parcel
 public class ResponseWord {
-    private long id;
-    private String category;
-    private String word;
-    private List<WordDefinition> definitions;
-    private List<WordExample> examples;
-    private String note;
+    long id;
+    String category;
+    String word;
+    List<WordDefinition> definitions;
+    List<WordExample> examples;
+    String note;
 
     public long getId() {
         return id;

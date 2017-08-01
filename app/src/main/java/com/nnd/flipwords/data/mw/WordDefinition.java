@@ -8,10 +8,10 @@ import org.parceler.Parcel;
 
 @Parcel
 public class WordDefinition {
-    private String text;
-    private String source;
-    private String note;
-    private String partOfSpeech;
+    String text;
+    String source;
+    String note;
+    String partOfSpeech;
 
     public String getText() {
         return text;

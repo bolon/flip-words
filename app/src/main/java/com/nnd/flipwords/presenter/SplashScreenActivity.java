@@ -19,7 +19,6 @@ import timber.log.Timber;
 
 public class SplashScreenActivity extends AppCompatActivity implements Callback<ResponseWord> {
     @Inject WordsInterface wordsAPI;
-    @Inject @Named("wordnik_key") String wordnikKey;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +26,7 @@ public class SplashScreenActivity extends AppCompatActivity implements Callback<
         setContentView(R.layout.activity_splash_screen);
 
         FlipWordsApp.getComponent().inject(this);
-        wordsAPI.getWordOfTheDay(Utils.getRandomDate(), wordnikKey).enqueue(this);
+        wordsAPI.getWordOfTheDay(Utils.getRandomDate()).enqueue(this);
     }
 
     void proceed(ResponseWord word) {
@@ -46,7 +45,7 @@ public class SplashScreenActivity extends AppCompatActivity implements Callback<
 
     @Override
     public void onFailure(Call<ResponseWord> call, Throwable t) {
-        Timber.e(call.request().url().toString());
+        Timber.e(call.request().url().encodedQuery());
         t.printStackTrace();
         proceed(null);
     }

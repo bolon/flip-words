@@ -8,10 +8,10 @@ import org.parceler.Parcel;
 
 @Parcel
 public class WordExample {
-    private long id;
-    private String title;
-    private String text;
-    private String url;
+    long id;
+    String title;
+    String text;
+    String url;
 
     public long getId() {
         return id;

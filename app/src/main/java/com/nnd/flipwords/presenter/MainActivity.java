@@ -21,7 +21,6 @@ import com.wajahatkarim3.easyflipview.EasyFlipView;
 import org.parceler.Parcels;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -33,7 +32,6 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity {
     private static final String WORDS_INTENT_KEY = "words_key";
     @Inject WordsInterface wordsAPI;
-    @Inject @Named("wordnik_key") String wordnikKey;
 
     @BindView(R.id.flipView) EasyFlipView flipView;
     @BindView(R.id.card_container) View cardContainerView;
@@ -64,24 +62,22 @@ public class MainActivity extends AppCompatActivity {
 
         });
 
-        wordsAPI.getWordOfTheDay(Utils.getRandomDate(), wordnikKey)
-                .enqueue(new Callback<ResponseWord>() {
-                    @Override
-                    public void onResponse(Call<ResponseWord> call, Response<ResponseWord> response) {
-                        if (response.body() != null) {
-                            flipView.flipTheView();
-                            setupWordCard(response.body());
-                            cardBackContainer.setVisibility(View.VISIBLE);
-                        }
-                    }
+        wordsAPI.getWordOfTheDay(Utils.getRandomDate()).enqueue(new Callback<ResponseWord>() {
+            @Override
+            public void onResponse(Call<ResponseWord> call, Response<ResponseWord> response) {
+                if (response.body() != null) {
+                    flipView.flipTheView();
+                    setupWordCard(response.body());
+                    cardBackContainer.setVisibility(View.VISIBLE);
+                }
+            }
 
-                    @Override
-                    public void onFailure(Call<ResponseWord> call, Throwable t) {
-                        cardBackContainer.setVisibility(View.INVISIBLE);
-                        Snackbar.make(parentLayout, "Check your connection", Snackbar.LENGTH_SHORT)
-                                .show();
-                    }
-                });
+            @Override
+            public void onFailure(Call<ResponseWord> call, Throwable t) {
+                cardBackContainer.setVisibility(View.INVISIBLE);
+                Snackbar.make(parentLayout, "Check your connection", Snackbar.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
