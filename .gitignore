@@ -16,6 +16,7 @@ key.properties
 /.idea/inspectionProfiles/profiles_settings.xml
 /.idea/codeStyleSettings.xml
 /.idea/markdown-navigator
+/.idea/markdown-navigator.xml
 
 .DS_Store
 /build
