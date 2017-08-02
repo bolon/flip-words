@@ -7,11 +7,11 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import okhttp3.Call;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.simplexml.SimpleXmlConverterFactory;
 import timber.log.Timber;
@@ -43,15 +43,9 @@ public class NetworkModule {
 
     @Provides
     @Singleton
-    Call.Factory provideCallFactoryDefault() {
-        return new OkHttpClient().newBuilder().build();
-    }
-
-    @Provides
-    @Singleton
     @Named("intercept_w_api_key")
     OkHttpClient provideCallFactoryIntercept(@Named("wordnik_key") String apiKey) {
-        OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(chain -> {
+        OkHttpClient.Builder okHttpClientBuilder = new OkHttpClient.Builder().addInterceptor(chain -> {
             Request request = chain.request();
 
             HttpUrl appenddedURL = request.url()
@@ -62,9 +56,8 @@ public class NetworkModule {
             request = request.newBuilder().url(appenddedURL).build();
 
             return chain.proceed(request);
-        }).build();
-
-        return okHttpClient;
+        });
+        return okHttpClientBuilder.build();
     }
 
     @Provides
@@ -80,12 +73,13 @@ public class NetworkModule {
     }
 
     @Provides
-    @Named("xml_based")
     @Singleton
-    Retrofit provideRetrofitXML(SimpleXmlConverterFactory converterFactory, Call.Factory callFactory) {
-        return new Retrofit.Builder().baseUrl(API_URL)
-                .addConverterFactory(converterFactory)
-                .callFactory(callFactory)
+    @Named("rxCFactory")
+    Retrofit provideRetrofitRX(GsonConverterFactory gsonConverterFactory, @Named("intercept_w_api_key") OkHttpClient okHttpClient) {
+        return new Retrofit.Builder().baseUrl(API_URL_WORDNIK)
+                .addConverterFactory(gsonConverterFactory)
+                .callFactory(okHttpClient)
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build();
     }
 
@@ -93,16 +87,23 @@ public class NetworkModule {
     @Named("json_based")
     @Singleton
     Retrofit provideRetrofitJSON(GsonConverterFactory converterFactory, @Named("intercept_w_api_key") OkHttpClient okHttpClient) {
-        Retrofit retrofit = new Retrofit.Builder().baseUrl(API_URL_WORDNIK)
+        return new Retrofit.Builder().baseUrl(API_URL_WORDNIK)
                 .addConverterFactory(converterFactory)
                 .callFactory(okHttpClient)
                 .build();
-
-        return retrofit;
     }
 
     @Provides
+    @Singleton
+    @Named("def")
     WordsInterface provideWordsDefInterface(@Named("json_based") Retrofit retrofit) {
+        return retrofit.create(WordsInterface.class);
+    }
+
+    @Provides
+    @Singleton
+    @Named("rx")
+    WordsInterface provideWordsDefInterfaceRX(@Named("rxCFactory") Retrofit retrofit) {
         return retrofit.create(WordsInterface.class);
     }
 }

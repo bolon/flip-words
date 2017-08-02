@@ -1,20 +1,28 @@
 package com.nnd.flipwords.data.mw;
 
-import org.parceler.Parcel;
+import com.nnd.flipwords.data.custparcel.DefinitionListParcelConverter;
+import com.nnd.flipwords.data.custparcel.ExampleListParcelConverter;
 
-import java.util.List;
+import org.parceler.Parcel;
+import org.parceler.ParcelProperty;
+import org.parceler.ParcelPropertyConverter;
+
+import io.realm.RealmList;
+import io.realm.RealmObject;
+import io.realm.ResponseWordRealmProxy;
+import io.realm.annotations.PrimaryKey;
 
 /**
  * Created by Android dev on 7/17/17.
  */
 
-@Parcel
-public class ResponseWord {
-    long id;
+@Parcel(implementations = {ResponseWordRealmProxy.class}, value = Parcel.Serialization.BEAN, analyze = {ResponseWord.class})
+public class ResponseWord extends RealmObject {
+    @PrimaryKey long id;
     String category;
     String word;
-    List<WordDefinition> definitions;
-    List<WordExample> examples;
+    RealmList<WordDefinition> definitions;
+    RealmList<WordExample> examples;
     String note;
 
     public long getId() {
@@ -41,19 +49,23 @@ public class ResponseWord {
         this.word = word;
     }
 
-    public List<WordDefinition> getDefinitions() {
+    public RealmList<WordDefinition> getDefinitions() {
         return definitions;
     }
 
-    public void setDefinitions(List<WordDefinition> definitions) {
+    @ParcelProperty("definitions")
+    @ParcelPropertyConverter(DefinitionListParcelConverter.class)
+    public void setDefinitions(RealmList<WordDefinition> definitions) {
         this.definitions = definitions;
     }
 
-    public List<WordExample> getExamples() {
+    public RealmList<WordExample> getExamples() {
         return examples;
     }
 
-    public void setExamples(List<WordExample> examples) {
+    @ParcelProperty("examples")
+    @ParcelPropertyConverter(ExampleListParcelConverter.class)
+    public void setExamples(RealmList<WordExample> examples) {
         this.examples = examples;
     }
 

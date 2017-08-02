@@ -12,8 +12,9 @@ import dagger.Component;
  */
 
 @Singleton
-@Component(modules = NetworkModule.class)
+@Component(modules = {NetworkModule.class, DataModule.class})
 public interface ApplicationComponent {
     void inject(MainActivity m);
+
     void inject(SplashScreenActivity s);
 }

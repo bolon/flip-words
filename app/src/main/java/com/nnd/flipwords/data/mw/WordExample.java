@@ -2,12 +2,15 @@ package com.nnd.flipwords.data.mw;
 
 import org.parceler.Parcel;
 
+import io.realm.RealmObject;
+import io.realm.WordExampleRealmProxy;
+
 /**
  * Created by Android dev on 7/24/17.
  */
 
-@Parcel
-public class WordExample {
+@Parcel(implementations = WordExampleRealmProxy.class)
+public class WordExample extends RealmObject {
     long id;
     String title;
     String text;

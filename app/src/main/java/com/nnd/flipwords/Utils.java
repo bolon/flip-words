@@ -1,7 +1,9 @@
 package com.nnd.flipwords;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -9,6 +11,22 @@ import java.util.Random;
  */
 
 public class Utils {
+    /**
+     * Get a bunch of random dates
+     *
+     * @param total total random dates
+     * @return List of random dates
+     */
+    public static List<String> getRandomDate(int total) {
+        List<String> randomDates = new ArrayList<>(total);
+
+        for (int i = 0; i < total; i++) {
+            randomDates.add(getRandomDate());
+        }
+
+        return randomDates;
+    }
+
     public static String getRandomDate() {
         GregorianCalendar gc = new GregorianCalendar();
 

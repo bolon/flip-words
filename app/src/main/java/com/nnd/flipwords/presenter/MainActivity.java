@@ -21,17 +21,19 @@ import com.wajahatkarim3.easyflipview.EasyFlipView;
 import org.parceler.Parcels;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import io.realm.Realm;
+import io.realm.RealmResults;
 
 public class MainActivity extends AppCompatActivity {
     private static final String WORDS_INTENT_KEY = "words_key";
-    @Inject WordsInterface wordsAPI;
+    private static final String WORDS_LIST_INTENT_KEY = "list_words_key";
+    @Inject @Named("def") WordsInterface wordsAPI;
+    @Inject Realm realm;
 
     @BindView(R.id.flipView) EasyFlipView flipView;
     @BindView(R.id.card_container) View cardContainerView;
@@ -58,26 +60,17 @@ public class MainActivity extends AppCompatActivity {
         cardBackContainer.setVisibility(View.INVISIBLE);
         animationView.setVisibility(View.VISIBLE);
 
-        txtViewCardBack.setOnClickListener(view -> {
+        RealmResults<ResponseWord> words = realm.where(ResponseWord.class).findAll();
 
-        });
+        if (words.size() > 0) {
+            flipView.flipTheView();
+            setupWordCard(words.first());
+            cardBackContainer.setVisibility(View.VISIBLE);
+        } else {
+            cardBackContainer.setVisibility(View.INVISIBLE);
+            Snackbar.make(parentLayout, "Check your connection", Snackbar.LENGTH_SHORT).show();
+        }
 
-        wordsAPI.getWordOfTheDay(Utils.getRandomDate()).enqueue(new Callback<ResponseWord>() {
-            @Override
-            public void onResponse(Call<ResponseWord> call, Response<ResponseWord> response) {
-                if (response.body() != null) {
-                    flipView.flipTheView();
-                    setupWordCard(response.body());
-                    cardBackContainer.setVisibility(View.VISIBLE);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseWord> call, Throwable t) {
-                cardBackContainer.setVisibility(View.INVISIBLE);
-                Snackbar.make(parentLayout, "Check your connection", Snackbar.LENGTH_SHORT).show();
-            }
-        });
     }
 
     @Override
@@ -85,14 +78,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        FlipWordsApp.getComponent().inject(this);
+        FlipWordsApp.getComponent(getApplicationContext()).inject(this);
         ButterKnife.bind(this);
         layoutCardBack.setVisibility(View.INVISIBLE);
 
-        if (getIntent().getParcelableExtra(WORDS_INTENT_KEY) != null) {
-            ResponseWord word = Parcels.unwrap(getIntent().getParcelableExtra(WORDS_INTENT_KEY));
-            setupWordCard(word);
-        }
+        ResponseWord word = realm.where(ResponseWord.class).findFirst();
+        setupWordCard(word);
+
+        //TODO 1 : observe this
+        //TODO 3 : from splash still writing. dont delete
+        //realm.executeTransaction(t -> t.where(ResponseWord.class).findFirst().deleteFromRealm());
+    }
+
+    void nextWord() {
     }
 
     void setupWordCard(ResponseWord word) {

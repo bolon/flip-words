@@ -1,11 +1,15 @@
 package com.nnd.flipwords;
 
 import android.app.Application;
+import android.content.Context;
 
 import com.nnd.flipwords.data.ApplicationComponent;
 import com.nnd.flipwords.data.DaggerApplicationComponent;
+import com.nnd.flipwords.data.DataModule;
 import com.nnd.flipwords.data.NetworkModule;
 
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
 import timber.log.Timber;
 
 /**
@@ -15,21 +19,25 @@ import timber.log.Timber;
 public class FlipWordsApp extends Application {
     private static ApplicationComponent component;
 
+    private static void createNewComponent(Context context) {
+        component = DaggerApplicationComponent.builder()
+                .networkModule(new NetworkModule())
+                .dataModule(new DataModule(context))
+                .build();
+    }
+
+    public static ApplicationComponent getComponent(Context context) {
+        if (component == null) createNewComponent(context);
+
+        return component;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
         Timber.plant(new Timber.DebugTree());
 
-        createNewComponent();
-    }
-
-    private static void createNewComponent() {
-        component = DaggerApplicationComponent.builder().networkModule(new NetworkModule()).build();
-    }
-
-    public static ApplicationComponent getComponent() {
-        if (component == null) createNewComponent();
-
-        return component;
+        createNewComponent(this);
+        Realm.init(this);
     }
 }
