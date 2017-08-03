@@ -47,10 +47,8 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.txtExample_cardback) TextView txtViewExample;
     @BindView(R.id.layout_card_back) View layoutCardBack;
 
-    public static Intent createIntent(Context context, ResponseWord word) {
+    public static Intent createIntent(Context context) {
         Intent intent = new Intent(context, MainActivity.class);
-
-        if (word != null) intent.putExtra(WORDS_INTENT_KEY, Parcels.wrap(word));
 
         return intent;
     }

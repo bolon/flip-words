@@ -21,12 +21,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import io.realm.Realm;
 import io.realm.RealmResults;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import timber.log.Timber;
 
-public class SplashScreenActivity extends AppCompatActivity implements Callback<ResponseWord> {
+public class SplashScreenActivity extends AppCompatActivity {
     private static int TOTAL_TO_FETCH = 10;
 
     @Inject @Named("def") WordsInterface wordsAPI;
@@ -42,7 +39,7 @@ public class SplashScreenActivity extends AppCompatActivity implements Callback<
         RealmResults<ResponseWord> words = realm.where(ResponseWord.class).findAll();
 
         if (words.isEmpty()) fetchMoreWords();
-        else proceed(words.first());
+        else proceed();
     }
 
     void fetchMoreWords() {
@@ -60,7 +57,7 @@ public class SplashScreenActivity extends AppCompatActivity implements Callback<
                 .doOnNext(word -> {
                     if (counter.getAndIncrement() > 5 && isStillHere.get()) {
                         isStillHere.set(false);
-                        proceed(realm.where(ResponseWord.class).findFirst());
+                        proceed();
                     }
                     realm.copyToRealmOrUpdate(word);
                 })
@@ -71,27 +68,9 @@ public class SplashScreenActivity extends AppCompatActivity implements Callback<
 
     /**
      * Next pls
-     * @param word
      */
-    void proceed(ResponseWord word) {
-        startActivity(MainActivity.createIntent(this, word));
+    void proceed() {
+        startActivity(MainActivity.createIntent(this));
         this.finish();
-    }
-
-    @Override
-    public void onResponse(Call<ResponseWord> call, Response<ResponseWord> response) {
-        try {
-            proceed(response.body());
-        } catch (NullPointerException ex) {
-            proceed(null);
-        }
-    }
-
-    @Override
-    public void onFailure(Call<ResponseWord> call, Throwable t) {
-        Timber.e("Call : " + call.request().url().toString());
-        Timber.e(call.request().url().encodedQuery());
-        t.printStackTrace();
-        proceed(null);
     }
 }
