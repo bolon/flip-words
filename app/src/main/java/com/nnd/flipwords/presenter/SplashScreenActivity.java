@@ -24,7 +24,7 @@ import io.realm.RealmResults;
 import timber.log.Timber;
 
 public class SplashScreenActivity extends AppCompatActivity {
-    private static int TOTAL_TO_FETCH = 10;
+    private static int TOTAL_TO_FETCH = 5;
 
     @Inject @Named("def") WordsInterface wordsAPI;
     @Inject @Named("rx") WordsInterface wordsAPIRX;
@@ -38,7 +38,7 @@ public class SplashScreenActivity extends AppCompatActivity {
         FlipWordsApp.getComponent(getApplicationContext()).inject(this);
         RealmResults<ResponseWord> words = realm.where(ResponseWord.class).findAll();
 
-        if (words.isEmpty()) fetchMoreWords();
+        if (words.size() - 2 < 1) fetchMoreWords();
         else proceed();
     }
 
@@ -54,14 +54,11 @@ public class SplashScreenActivity extends AppCompatActivity {
                 .flatMap(date -> wordsAPIRX.getWordOfTheDayRX(date))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext(word -> {
-                    if (counter.getAndIncrement() > 5 && isStillHere.get()) {
-                        isStillHere.set(false);
-                        proceed();
-                    }
-                    realm.copyToRealmOrUpdate(word);
+                .doOnNext(word -> realm.copyToRealmOrUpdate(word))
+                .doOnComplete(() -> {
+                    realm.commitTransaction();
+                    proceed();
                 })
-                .doOnComplete(() -> realm.commitTransaction())
                 .doOnError(t -> Timber.e(t.getMessage()))
                 .subscribe();
     }

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
@@ -18,7 +17,7 @@ import com.nnd.flipwords.data.mw.WordDefinition;
 import com.nnd.flipwords.data.mw.WordExample;
 import com.wajahatkarim3.easyflipview.EasyFlipView;
 
-import org.parceler.Parcels;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -26,13 +25,21 @@ import javax.inject.Named;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import io.realm.Realm;
+import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
+import timber.log.Timber;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements RealmChangeListener<Realm> {
     private static final String WORDS_INTENT_KEY = "words_key";
     private static final String WORDS_LIST_INTENT_KEY = "list_words_key";
+    private static int TOTAL_TO_FETCH = 5;
     @Inject @Named("def") WordsInterface wordsAPI;
+    @Inject @Named("rx") WordsInterface wordsAPIRX;
+
     @Inject Realm realm;
 
     @BindView(R.id.flipView) EasyFlipView flipView;
@@ -53,6 +60,8 @@ public class MainActivity extends AppCompatActivity {
         return intent;
     }
 
+    //fetch from api -> after done -> fetch from db -> show first -> on click -> delete 1st
+    //fetch from db -> show 1st ->
     @OnClick(R.id.btnYes_cardback)
     protected void onYesBtnClicked() {
         cardBackContainer.setVisibility(View.INVISIBLE);
@@ -60,15 +69,23 @@ public class MainActivity extends AppCompatActivity {
 
         RealmResults<ResponseWord> words = realm.where(ResponseWord.class).findAll();
 
-        if (words.size() > 0) {
-            flipView.flipTheView();
-            setupWordCard(words.first());
-            cardBackContainer.setVisibility(View.VISIBLE);
-        } else {
-            cardBackContainer.setVisibility(View.INVISIBLE);
-            Snackbar.make(parentLayout, "Check your connection", Snackbar.LENGTH_SHORT).show();
+        if (words.size() == 1) {
+            realm.removeAllChangeListeners();
+            Observable<List<String>> obsDate = Observable.fromArray(Utils.getRandomDate(TOTAL_TO_FETCH));
+            obsDate.flatMapIterable(dates -> dates)
+                    .flatMap(date -> wordsAPIRX.getWordOfTheDayRX(date))
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnNext(word -> realm.executeTransaction(trx -> trx.copyToRealmOrUpdate(word)))
+                    .doOnComplete(this::onYesBtnClicked)
+                    .doOnError(t -> Timber.e(t.getMessage()))
+                    .subscribe();
+            return;
         }
 
+        realm.addChangeListener(this);
+
+        realm.executeTransaction(t -> t.where(ResponseWord.class).findFirst().deleteFromRealm());
     }
 
     @Override
@@ -82,13 +99,6 @@ public class MainActivity extends AppCompatActivity {
 
         ResponseWord word = realm.where(ResponseWord.class).findFirst();
         setupWordCard(word);
-
-        //TODO 1 : observe this
-        //TODO 3 : from splash still writing. dont delete
-        //realm.executeTransaction(t -> t.where(ResponseWord.class).findFirst().deleteFromRealm());
-    }
-
-    void nextWord() {
     }
 
     void setupWordCard(ResponseWord word) {
@@ -98,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
         WordDefinition def = word.getDefinitions().get(defIdx);
         WordExample ex = word.getExamples().get(exIdx);
 
-        txtViewCardFront.setText(word.getWord());
+        txtViewCardFront.setText(word.getWord().trim());
         txtViewCardBack.setText(word.getWord());
         txtViewType.setText(def.getPartOfSpeech());
         txtViewMeaning.setText(def.getText());
@@ -109,6 +119,18 @@ public class MainActivity extends AppCompatActivity {
 
     public void onClickBtnFront(View v) {
         layoutCardBack.setVisibility(View.VISIBLE);
+        flipView.flipTheView();
+    }
+
+    @Override
+    public void onChange(Realm t) {
+        ResponseWord w = t.where(ResponseWord.class).findFirst();
+        nextWord(w);
+    }
+
+    void nextWord(ResponseWord word) {
+        setupWordCard(word);
+        cardBackContainer.setVisibility(View.VISIBLE);
         flipView.flipTheView();
     }
 }
