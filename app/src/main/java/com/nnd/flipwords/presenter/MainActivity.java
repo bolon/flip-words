@@ -11,6 +11,8 @@ import android.widget.TextView;
 import com.nnd.flipwords.FlipWordsApp;
 import com.nnd.flipwords.R;
 import com.nnd.flipwords.Utils;
+import com.nnd.flipwords.data.APIErrorAction;
+import com.nnd.flipwords.data.APIResolver;
 import com.nnd.flipwords.data.WordsInterface;
 import com.nnd.flipwords.data.mw.ResponseWord;
 import com.nnd.flipwords.data.mw.WordDefinition;
@@ -27,11 +29,12 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Action;
+import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
-import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity implements RealmChangeListener<Realm> {
     private static final String WORDS_INTENT_KEY = "words_key";
@@ -53,6 +56,10 @@ public class MainActivity extends AppCompatActivity implements RealmChangeListen
     @BindView(R.id.txtMeaning_cardback) TextView txtViewMeaning;
     @BindView(R.id.txtExample_cardback) TextView txtViewExample;
     @BindView(R.id.layout_card_back) View layoutCardBack;
+
+    Consumer<ResponseWord> onNextAction;
+    Consumer<Throwable> onErrorAction;
+    Action onCompleteAction;
 
     public static Intent createIntent(Context context) {
         Intent intent = new Intent(context, MainActivity.class);
@@ -76,10 +83,8 @@ public class MainActivity extends AppCompatActivity implements RealmChangeListen
                     .flatMap(date -> wordsAPIRX.getWordOfTheDayRX(date))
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .doOnNext(word -> realm.executeTransaction(trx -> trx.copyToRealmOrUpdate(word)))
-                    .doOnComplete(this::onYesBtnClicked)
-                    .doOnError(t -> Timber.e(t.getMessage()))
-                    .subscribe();
+                    .retryWhen(new APIResolver(3, 100))
+                    .subscribe(onNextAction, onErrorAction, onCompleteAction);
             return;
         }
 
@@ -96,6 +101,10 @@ public class MainActivity extends AppCompatActivity implements RealmChangeListen
         FlipWordsApp.getComponent(getApplicationContext()).inject(this);
         ButterKnife.bind(this);
         layoutCardBack.setVisibility(View.INVISIBLE);
+
+        onNextAction = word -> realm.executeTransaction(trx -> trx.copyToRealmOrUpdate(word));
+        onCompleteAction = this::onYesBtnClicked;
+        onErrorAction = new APIErrorAction(parentLayout);
 
         ResponseWord word = realm.where(ResponseWord.class).findFirst();
         setupWordCard(word);

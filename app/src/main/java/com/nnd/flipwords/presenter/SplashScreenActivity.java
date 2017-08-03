@@ -31,7 +31,7 @@ import io.realm.RealmResults;
 import timber.log.Timber;
 
 public class SplashScreenActivity extends AppCompatActivity {
-    private static int TOTAL_TO_FETCH = 15;
+    private static int TOTAL_TO_FETCH = 3;
 
     @BindView(R.id.splash_container) View rootView;
 
