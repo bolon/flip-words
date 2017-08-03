@@ -36,7 +36,7 @@ import timber.log.Timber;
 public class MainActivity extends AppCompatActivity implements RealmChangeListener<Realm> {
     private static final String WORDS_INTENT_KEY = "words_key";
     private static final String WORDS_LIST_INTENT_KEY = "list_words_key";
-    private static int TOTAL_TO_FETCH = 5;
+    private static int TOTAL_TO_FETCH = 15;
     @Inject @Named("def") WordsInterface wordsAPI;
     @Inject @Named("rx") WordsInterface wordsAPIRX;
 

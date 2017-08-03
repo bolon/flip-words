@@ -24,7 +24,7 @@ import io.realm.RealmResults;
 import timber.log.Timber;
 
 public class SplashScreenActivity extends AppCompatActivity {
-    private static int TOTAL_TO_FETCH = 5;
+    private static int TOTAL_TO_FETCH = 15;
 
     @Inject @Named("def") WordsInterface wordsAPI;
     @Inject @Named("rx") WordsInterface wordsAPIRX;
