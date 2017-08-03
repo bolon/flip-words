@@ -96,12 +96,6 @@ def incrementVersionProp(File versionFile) {
     properties.store(versionFile.newWriter(), null)
 }
 
-def androidAppCompatVersion = '26.0.0'
-def retrofitVersion = '2.3.0'
-def daggerVersion = '2.11'
-def butterKnifeVersion = '8.7.0'
-def parcelerVersion = '1.1.9'
-
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
@@ -129,17 +123,17 @@ dependencies {
         exclude group: 'stax', module: 'stax'
     }
 
-    compile 'com.airbnb.android:lottie:2.1.0'
+    compile "com.airbnb.android:lottie:$lottieVersion"
 
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    compile "com.android.support.constraint:constraint-layout:$androidConstraintLayoutVersion"
 
-    compile 'com.github.bolon:EasyFlipView:1.0.3'
+    compile "com.github.bolon:EasyFlipView:$bolonFlipView"
 
-    compile 'io.reactivex.rxjava2:rxjava:2.1.2'
-    compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
-    compile 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
+    compile "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
+    compile "io.reactivex.rxjava2:rxandroid:$rxAndroidVersion"
+    compile "com.squareup.retrofit2:adapter-rxjava2:$rxRetrofitAdptVersion"
 
-    compile 'com.jakewharton.timber:timber:4.5.1'
+    compile "com.jakewharton.timber:timber:$timberVersion"
 
     testCompile 'junit:junit:4.12'
 }
